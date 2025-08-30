@@ -1,0 +1,38 @@
+/* Global font settings */
+
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Sidebar / panel headings */
+.sidebar-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Body text / list items */
+p, span, li {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+}
+
+/* Map popup */
+.leaflet-popup-content {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+}
+
+
