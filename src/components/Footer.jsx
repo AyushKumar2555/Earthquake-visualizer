@@ -6,7 +6,7 @@ const Footer = ({ lastRefreshed }) => {
     // The footer container. Using 'mt-auto' pushes it to the bottom of the page.
     // We're using flexbox to lay out the content, making it responsive for both
     // mobile and desktop views.
-    <footer className="mt-auto bg-gray-100 text-gray-700 p-4 flex flex-col md:flex-row justify-between items-center shadow-inner text-sm z-20 h-3">
+    <footer className="mt-auto bg-gray-100 text-gray-700 p-4 flex flex-col md:flex-row justify-between items-center shadow-inner text-sm z-20 h-10">
       {/* Left side: Displays the current year for copyright. */}
       <p>&copy; {new Date().getFullYear()} Earthquake Tracker</p>
 
