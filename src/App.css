@@ -51,3 +51,8 @@ li {
   font-family: "Inter", sans-serif;
   font-size: 0.9rem;
 }
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

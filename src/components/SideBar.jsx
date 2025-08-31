@@ -14,7 +14,7 @@ const SideBar = ({
 }) => {
   return (
     // This main div is the container for the entire sidebar, setting its layout and size.
-    <div className="flex flex-col h-full w-full p-4">
+    <div className="flex flex-col h-full w-full p-4 ">
       {/* This is our close button for the sidebar. We only show it on mobile devices,
           since the sidebar is always visible on larger screens. */}
       <div className="flex justify-end md:hidden">

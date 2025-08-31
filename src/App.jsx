@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect } from "react";
 import SideBar from "./components/SideBar";
 import MapView from "./components/MapView";
@@ -93,7 +92,7 @@ function App() {
 
   return (
     // This is the main container for our app. It's set up to take up the whole screen.
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col min-h-screen">
       {/* Our top bar with the app name and refresh button. */}
       <Header
         onRefresh={handleRefresh}
@@ -102,15 +101,15 @@ function App() {
       />
       
       {/* This section holds the sidebar and the map view side-by-side. */}
-      <div className="flex flex-1 relative md:static">
-        {/* Here's the sidebar container. We're using some Tailwind magic to make it
-            slide in from the left on mobile and stay put on bigger screens. */}
+      <div className="flex flex-1 relative">
+        {/* We've added a new flex container for the Sidebar and Map. */}
+        {/* The Sidebar container now has `relative` positioning on md screens. */}
         <div
           className={`
-            fixed inset-y-0 left-0 z-50 w-3/4 md:w-80 bg-white shadow-xl 
+            fixed inset-y-0 left-0 z-50 w-3/4  h-153 md:w-80 bg-white shadow-xl 
             transform transition-transform duration-300 ease-in-out
             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            md:translate-x-0 md:relative
+            md:translate-x-0 md:relative 
           `}
         >
           <SideBar
