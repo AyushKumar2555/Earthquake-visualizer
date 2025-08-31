@@ -1,12 +1,85 @@
-# React + Vite
+🌍 Earthquake Visualizer
+📌 Overview
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Earthquake Visualizer is a React-based application that displays earthquake data from the USGS (United States Geological Survey) API.
+It provides a responsive UI with a collapsible sidebar for filtering earthquakes and an interactive Leaflet map to visualize earthquake locations globally.
 
-Currently, two official plugins are available:
+📂 Folder Structure
+/
+├── public/                 # Static assets (index.html, favicon, etc.)
+├── src/
+│   ├── components/         # Reusable components
+│   │   ├── Footer.jsx
+│   │   ├── Header.jsx
+│   │   ├── MapView.jsx
+│   │   └── Sidebar.jsx
+│   ├── App.jsx             # Root component
+│   └── index.css           # Global styles
+├── package.json
+└── README.md
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+src/components/ → Header, Sidebar, MapView, Footer
 
-## Expanding the ESLint configuration
+src/ → Root App.jsx and main stylesheet
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+public/ → Static assets (index.html, favicon)
+✨ Key Features
+
+⚡ Real-time Data – Fetches earthquake data from the USGS API (24h, 7d, 30d).
+
+🗺️ Interactive Map – Displays earthquake markers with popups showing details.
+
+🔍 Filtering Options – Filter earthquakes by minimum magnitude & time period.
+
+📱💻 Responsive Design – Sidebar collapses on mobile; full layout on desktop.
+
+📌 Collapsible Sidebar – Displays recent earthquakes and filters side-by-side with the map.
+
+✅ Recent Updates
+
+Layout Fixes – Refactored with flex-col and min-h-screen to keep footer at bottom.
+
+Sidebar Positioning – Now overlays correctly on mobile and stays aligned on larger screens.
+
+Dependency Management – Cleaned imports; unused code removed.
+
+🛠️ Technologies Used
+
+⚛️ React.js – Component-based UI
+
+🎨 Tailwind CSS – Styling
+
+🗺️ Leaflet.js + React-Leaflet – Map visualization
+
+📈 USGS API – Real-time earthquake data
+
+🚀 Deployment
+
+This project is deployed on Vercel for live demo:
+
+👉 https://earthquake-visualizer-tau.vercel.app/
+
+⚙️ Setup Instructions
+
+Clone the repository
+
+git clone https://github.com/your-username/earthquake-visualizer.git
+cd earthquake-visualizer
+
+Install dependencies
+npm install
+
+Run locally
+npm start
+
+Build for production
+npm run build
+
+📸 Screenshots
+
+
+
+👨‍💻 Author
+
+Ayush Kumar
+
