@@ -92,7 +92,7 @@ function App() {
 
   return (
     // This is the main container for our app. It's set up to take up the whole screen.
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen overflow-hidden">
       {/* Our top bar with the app name and refresh button. */}
       <Header
         onRefresh={handleRefresh}
@@ -109,7 +109,7 @@ function App() {
             fixed inset-y-0 left-0 z-50 w-3/4  h-full md:w-80 bg-white shadow-xl 
             transform transition-transform duration-300 ease-in-out 
             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            md:translate-x-0 md:relative md:h-[calc(100vh-10px)]
+            md:h-10 md:relative  
           `}
         >
           <SideBar
