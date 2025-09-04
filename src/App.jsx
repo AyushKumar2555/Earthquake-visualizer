@@ -107,9 +107,9 @@ function App() {
         <div
           className={`
             fixed inset-y-0 left-0 z-50 w-3/4  h-full md:w-80 bg-white shadow-xl 
-            transform transition-transform duration-300 ease-in-out
+            transform transition-transform duration-300 ease-in-out 
             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            md:translate-x-0 md:absolute md:h-full
+            md:translate-x-0 md:relative md:h-[calc(100vh-10px)]
           `}
         >
           <SideBar
