@@ -7,35 +7,79 @@ import "./App.css";
 
 const USGS_BASE = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/";
 
+// Custom Notification Component
+const Notification = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  const bgColor = type === "success" ? "bg-green-500" : "bg-red-500";
+  
+  return (
+    <div className={`fixed bottom-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300`}>
+      <div className="flex items-center">
+        <span className="mr-2">
+          {type === "success" ? "✓" : "⚠"}
+        </span>
+        <span>{message}</span>
+        <button 
+          onClick={onClose}
+          className="ml-4 text-white hover:text-gray-200"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+};
+
 function App() {
-  // Let's set up all our main state variables. This is like the brain of our app.
   const [earthquakes, setEarthquakes] = useState([]);
   const [filters, setFilters] = useState({ minMag: 0, time: "day" });
   const [selectedEarthquake, setSelectedEarthquake] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // This state controls whether the sidebar is open on mobile. We'll start it open by default.
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  // This little function just flips the sidebar state. Super handy for the close button.
+  const [stats, setStats] = useState({ total: 0, maxMag: 0, avgDepth: 0 });
+  const [notification, setNotification] = useState({ show: false, message: "", type: "" });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ show: true, message, type });
+  };
+
+  const hideNotification = () => {
+    setNotification({ show: false, message: "", type: "" });
+  };
+
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
-  // A helper function to build the right API URL based on our time filter.
   const getApiUrl = () => {
     if (filters.time === "week") return `${USGS_BASE}all_week.geojson`;
     if (filters.time === "month") return `${USGS_BASE}all_month.geojson`;
     return `${USGS_BASE}all_day.geojson`;
   };
 
-  // This is the main function that talks to the USGS API to get earthquake data.
+  const calculateStats = (data) => {
+    if (data.length === 0) return { total: 0, maxMag: 0, avgDepth: 0 };
+    
+    const maxMag = Math.max(...data.map(eq => eq.magnitude));
+    const totalDepth = data.reduce((sum, eq) => sum + eq.depth, 0);
+    const avgDepth = totalDepth / data.length;
+    
+    return { total: data.length, maxMag, avgDepth: Math.round(avgDepth) };
+  };
+
   const fetchEarthquakeData = async () => {
     setIsRefreshing(true);
     try {
       const res = await fetch(getApiUrl());
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      
       const data = await res.json();
-
-      // We'll process the raw API data here to make it easier to work with.
-      // We're also making sure we only get valid data points.
       const parsed = (data.features || [])
         .filter(
           (eq) =>
@@ -48,87 +92,96 @@ function App() {
           magnitude: eq.properties.mag,
           place: eq.properties.place,
           time: eq.properties.time,
-          depth: eq.geometry.coordinates[2],
-          coordinates: [
-            eq.geometry.coordinates[0],
-            eq.geometry.coordinates[1],
-          ],
+          depth: Math.round(eq.geometry.coordinates[2]),
+          coordinates: [eq.geometry.coordinates[0], eq.geometry.coordinates[1]],
+          url: eq.properties.url,
+          significance: eq.properties.sig
         }));
 
       setEarthquakes(parsed);
+      setStats(calculateStats(parsed));
       setLastRefreshed(new Date());
-      // We want to clear the selected earthquake when we refresh the data.
       setSelectedEarthquake(null);
+      
+      showNotification(`Loaded ${parsed.length} earthquakes`);
     } catch (error) {
-      console.error("Oops! Ran into an error fetching earthquake data:", error);
+      console.error("Error fetching earthquake data:", error);
+      showNotification("Failed to fetch earthquake data", "error");
     } finally {
       setIsRefreshing(false);
     }
   };
 
-  // This hook runs every time the time filter changes, so the data is always fresh.
   useEffect(() => {
     fetchEarthquakeData();
+    // Set up auto-refresh every 5 minutes
+    const interval = setInterval(fetchEarthquakeData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
     // eslint-disable-next-line
   }, [filters.time]);
 
-  // A simple handler to update our filter state. It also clears the selected earthquake
-  // to avoid any visual weirdness.
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setSelectedEarthquake(null);
   };
 
-  // This function is for our manual refresh button in the header.
-  const handleRefresh = () => {
-    fetchEarthquakeData();
-  };
-  
-  // We'll create a filtered list of earthquakes here so that both the sidebar and the map
-  // are always showing the same data.
   const filteredEarthquakes = earthquakes.filter(
     (eq) => eq.magnitude >= filters.minMag
   );
 
   return (
-    // This is the main container for our app. It's set up to take up the whole screen.
-    <div className="flex flex-col h-screen overflow-hidden">
-      {/* Our top bar with the app name and refresh button. */}
+    <div className="flex flex-col h-screen overflow-hidden bg-gray-50">
+      {/* Custom Notification */}
+      {notification.show && (
+        <Notification 
+          message={notification.message} 
+          type={notification.type} 
+          onClose={hideNotification} 
+        />
+      )}
+      
+      {/* Header */}
       <Header
-        onRefresh={handleRefresh}
+        onRefresh={fetchEarthquakeData}
         isRefreshing={isRefreshing}
         onToggleSidebar={toggleSidebar}
+        stats={stats}
       />
-      
-      {/* This section holds the sidebar and the map view side-by-side. */}
-      <div className="flex flex-1 relative">
-        {/* We've added a new flex container for the Sidebar and Map. */}
-        {/* The Sidebar container now has `relative` positioning on md screens. */}
+
+      {/* Main Content (Sidebar + Map) */}
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Sidebar backdrop for mobile - FIXED: Added proper conditional rendering */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:bg-transparent md:pointer-events-none"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+        
+        {/* Sidebar */}
         <div
           className={`
-            fixed inset-y-0 left-0 z-50 w-3/4  h-full md:w-80 bg-white shadow-xl 
-            transform transition-transform duration-300 ease-in-out 
+            w-80 bg-white shadow-xl
+            transform transition-transform duration-300 ease-in-out
             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            md:h-10 md:relative  
+            fixed md:relative z-50 h-full
           `}
         >
           <SideBar
-            // We pass down our filtered data and state to the sidebar.
             earthquakes={filteredEarthquakes}
             filters={filters}
             onFilterChange={handleFilterChange}
             onSelectEq={setSelectedEarthquake}
             selectedEq={selectedEarthquake}
             isRefreshing={isRefreshing}
-            isOpen={isSidebarOpen}
             onToggleSidebar={toggleSidebar}
+            stats={stats}
           />
         </div>
 
-        {/* This is our map! It takes up the rest of the screen. */}
-        <div className="flex-1">
+        {/* Map */}
+        <div className="flex-1 relative h-full">
           <MapView
-            // We'll give the map the same filtered data as the sidebar.
             earthquakes={filteredEarthquakes}
             selectedEq={selectedEarthquake}
             setSelectedEq={setSelectedEarthquake}
@@ -136,7 +189,7 @@ function App() {
         </div>
       </div>
 
-      {/* The footer at the bottom of the page. */}
+      {/* Footer */}
       <Footer
         lastRefreshed={
           lastRefreshed ? lastRefreshed.toLocaleString() : "Not refreshed yet"
